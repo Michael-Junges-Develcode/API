@@ -1,0 +1,30 @@
+{
+  "name": "graphqlrocket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsnd --respawn --transpile-only src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/uuid": "^8.3.4",
+    "prisma": "^4.4.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.4.0",
+    "apollo-server": "^3.10.2",
+    "bcrypt": "^5.0.1",
+    "class-validator": "^0.13.2",
+    "graphql": "^15.8.0",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
+    "uuid": "^9.0.0"
+  }
+}
