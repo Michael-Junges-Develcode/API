@@ -3,20 +3,37 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type AuthenticatedUser {
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  name: String
+  password: String!
+  token: String
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
 type Mutation {
-  logIn(data: UserLogIn!): User
+  logIn(data: UserLogIn!): AuthenticatedUser
   signUp(data: UserSignUp!): User!
 }
 
 type Query {
   findAllUsers(page: Float!): [User!]
   findUserById(id: String!): User
+  getActiveTokens: [Token!]!
   privateInfo(token: String!): User
+}
+
+type Token {
+  id: ID!
+  token: String!
+  user: String
+  usersId: String!
 }
 
 type User {

@@ -12,7 +12,8 @@ import { Context } from "../../context/context";
 import { User } from "../../dtos/models/User/User";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import { AuthenticatedUser } from "../../dtos/models/Token/Token";
+import { AuthenticatedUser } from "../../dtos/models/AuthenticatedUser/AuthenticatedUser";
+import { sign } from "jsonwebtoken";
 
 @InputType()
 class UserSignUp {
@@ -88,27 +89,27 @@ export class UserResolver {
     });
   }
 
-  @Mutation(() => User, { nullable: true })
+  @Mutation(() => AuthenticatedUser, { nullable: true })
   async logIn(@Arg("data") data: UserLogIn, @Ctx() ctx: Context) {
     const user = await ctx.prisma.users.findUnique({
       where: { email: data.email },
     });
 
-    if (!user) return null;
+    if (!user) throw new Error('Incorrect email/password combination');
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const isValid = await bcrypt.compare(data.password, user.password);
+    console.log(isValid);
 
-    const isValid = await bcrypt.compare(hashedPassword, user.password);
-    console.log(isValid)
+    if (isValid === false) throw new Error("Incorrect email/password combination");
 
-    if (!isValid) return null;
+    const generatedToken = sign({}, process.env.ACCESS_TOKEN_SECRET!, {
+      subject: `"${user.id}"`,
+    });
 
-    const generatedToken = uuid();
-
-    const newToken = await ctx.prisma.tokens.create({
+    const signedUser = await ctx.prisma.tokens.create({
       data: { token: generatedToken, user: { connect: { id: user.id } } },
     });
 
-    return user;
+    return { ...user, token: signedUser.token };
   }
 }

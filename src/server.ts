@@ -4,10 +4,13 @@ import { buildSchema } from "type-graphql";
 import path from "node:path";
 import { context } from "./context/context";
 import { UserResolver } from "./resolvers/User/UserResolver";
+import AuthenticationAssurance from "./AuthenticationAssurance";
+import { TokenResolver } from "./resolvers/Token/TokenResolver";
 
 async function main() {
   const schema = await buildSchema({
-    resolvers: [UserResolver],
+    resolvers: [UserResolver, TokenResolver],
+    authChecker: AuthenticationAssurance,
     emitSchemaFile: path.resolve(__dirname, "schema.gql"),
   });
 
