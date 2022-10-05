@@ -13,9 +13,6 @@ export class User {
   @IsEmail()
   email: string;
 
-  @Field((type) => String)
-  password: string;
-
   @Field((type) => Date)
   createdAt: Date;
 }

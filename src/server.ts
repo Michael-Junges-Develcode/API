@@ -2,10 +2,11 @@ import { ApolloServer } from "apollo-server";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import path from "node:path";
-import { context } from "./context/context";
 import { UserResolver } from "./resolvers/User/UserResolver";
-import AuthenticationAssurance from "./AuthenticationAssurance";
+import AuthenticationAssurance from "./context/AuthenticationAssurance";
 import { TokenResolver } from "./resolvers/Token/TokenResolver";
+import { PrismaClient } from "@prisma/client";
+import { context } from "./context/context";
 
 async function main() {
   const schema = await buildSchema({
@@ -14,7 +15,14 @@ async function main() {
     emitSchemaFile: path.resolve(__dirname, "schema.gql"),
   });
 
-  const server = new ApolloServer({ schema, context });
+  const server = new ApolloServer({
+    schema,
+    context: ({ req }) => {
+      const prisma = context.prisma
+      const ctx = { req, token: req?.headers?.authorization, prisma };
+      return ctx;
+    },
+  });
 
   const { url } = await server.listen();
 

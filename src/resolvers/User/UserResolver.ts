@@ -11,14 +11,13 @@ import {
 import { Context } from "../../context/context";
 import { User } from "../../dtos/models/User/User";
 import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
 import { AuthenticatedUser } from "../../dtos/models/AuthenticatedUser/AuthenticatedUser";
 import { sign } from "jsonwebtoken";
 
 @InputType()
 class UserSignUp {
-  @Field()
-  name: string;
+  @Field({nullable: true})
+  name?: string;
 
   @Field()
   @IsEmail()
@@ -41,7 +40,7 @@ class UserLogIn {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  async privateInfo(
+  async auth(
     @Arg("token") token: string,
     @Ctx() ctx: Context
   ): Promise<User | null> {
@@ -50,8 +49,14 @@ export class UserResolver {
       include: { user: true },
     });
     if (!dbToken) return null;
+    const user = dbToken.user;
 
-    return dbToken.user;
+    return {
+      id: user.id,
+      name: user.name ?? undefined,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
   }
 
   @Query(() => User, { nullable: true })
@@ -64,7 +69,7 @@ export class UserResolver {
     });
     if (!user) return null;
 
-    return user;
+    return { id: user.id, email: user.email, createdAt: user.createdAt };
   }
 
   @Query(() => [User], { nullable: true })
@@ -84,9 +89,15 @@ export class UserResolver {
     @Ctx() ctx: Context
   ): Promise<User> {
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    return ctx.prisma.users.create({
+    const createdUser = await ctx.prisma.users.create({
       data: { ...data, password: hashedPassword },
     });
+    return {
+      id: createdUser.id,
+      name: createdUser.name ?? undefined,
+      email: createdUser.email,
+      createdAt: createdUser.createdAt,
+    };
   }
 
   @Mutation(() => AuthenticatedUser, { nullable: true })
@@ -95,16 +106,22 @@ export class UserResolver {
       where: { email: data.email },
     });
 
-    if (!user) throw new Error('Incorrect email/password combination');
+    if (!user) throw new Error("Incorrect email/password combination");
 
     const isValid = await bcrypt.compare(data.password, user.password);
     console.log(isValid);
 
-    if (isValid === false) throw new Error("Incorrect email/password combination");
+    if (isValid === false)
+      throw new Error("Incorrect email/password combination");
 
-    const generatedToken = sign({}, process.env.ACCESS_TOKEN_SECRET!, {
-      subject: `"${user.id}"`,
-    });
+    const generatedToken = sign(
+      { id: user.id },
+      process.env.ACCESS_TOKEN_SECRET!,
+      {
+        subject: `"${user.id}"`,
+        expiresIn: "1d",
+      }
+    );
 
     const signedUser = await ctx.prisma.tokens.create({
       data: { token: generatedToken, user: { connect: { id: user.id } } },
