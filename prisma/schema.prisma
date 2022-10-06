@@ -26,6 +26,7 @@ model Tokens {
   token   String @unique
   user    Users  @relation(fields: [usersId], references: [id])
   usersId String
+  createdAt  DateTime   @default(now())
 }
 
 model Messages {

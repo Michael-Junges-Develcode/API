@@ -135,6 +135,6 @@ export class UserResolver {
       data: { token: generatedToken, user: { connect: { id: user.id } } },
     });
 
-    return signedUser.token;
+    return signedUser;
   }
 }
