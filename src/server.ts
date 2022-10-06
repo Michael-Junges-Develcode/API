@@ -7,10 +7,11 @@ import AuthenticationAssurance from "./context/AuthenticationAssurance";
 import { TokenResolver } from "./resolvers/Token/TokenResolver";
 import { PrismaClient } from "@prisma/client";
 import { context } from "./context/context";
+import { MessageResolver } from "./resolvers/Message/MessageResolver";
 
 async function main() {
   const schema = await buildSchema({
-    resolvers: [UserResolver, TokenResolver],
+    resolvers: [UserResolver, TokenResolver, MessageResolver],
     authChecker: AuthenticationAssurance,
     emitSchemaFile: path.resolve(__dirname, "schema.gql"),
   });

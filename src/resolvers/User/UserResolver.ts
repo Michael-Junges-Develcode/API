@@ -11,12 +11,12 @@ import {
 import { Context } from "../../context/context";
 import { User } from "../../dtos/models/User/User";
 import bcrypt from "bcrypt";
-import { AuthenticatedUser } from "../../dtos/models/AuthenticatedUser/AuthenticatedUser";
 import { sign } from "jsonwebtoken";
+import { Token } from "../../dtos/models/Token/Token";
 
 @InputType()
 class UserSignUp {
-  @Field({nullable: true})
+  @Field({ nullable: true })
   name?: string;
 
   @Field()
@@ -80,7 +80,15 @@ export class UserResolver {
     const users = await ctx.prisma.users.findMany();
     if (!users) return null;
     console.log(users);
-    return users;
+    const rearrangedUsers = users.map((users) => {
+      return {
+        id: users.id,
+        name: users.name ?? undefined,
+        createdAt: users.createdAt,
+        email: users.email,
+      };
+    });
+    return rearrangedUsers;
   }
 
   @Mutation(() => User)
@@ -100,7 +108,7 @@ export class UserResolver {
     };
   }
 
-  @Mutation(() => AuthenticatedUser, { nullable: true })
+  @Mutation(() => Token, { nullable: true })
   async logIn(@Arg("data") data: UserLogIn, @Ctx() ctx: Context) {
     const user = await ctx.prisma.users.findUnique({
       where: { email: data.email },
@@ -127,6 +135,6 @@ export class UserResolver {
       data: { token: generatedToken, user: { connect: { id: user.id } } },
     });
 
-    return { ...user, token: signedUser.token };
+    return signedUser.token;
   }
 }

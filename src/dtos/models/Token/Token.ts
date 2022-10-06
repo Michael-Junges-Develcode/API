@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from "type-graphql";
+import { User } from "../User/User";
 
 @ObjectType()
 export class Token {
@@ -7,9 +8,6 @@ export class Token {
 
   @Field()
   token: string;
-
-  @Field({nullable: true})
-  user?: string;
 
   @Field()
   usersId: string;
