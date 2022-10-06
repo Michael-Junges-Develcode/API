@@ -3,21 +3,28 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type AuthenticatedUser {
-  createdAt: DateTime!
-  email: String!
-  id: ID!
-  name: String
-  token: String
-}
-
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
+type Message {
+  createdAt: DateTime!
+  id: ID!
+  receiverId: String!
+  senderId: String!
+  text: String!
+}
+
+input MessageInput {
+  receiverId: String!
+  senderId: String!
+  text: String!
+}
+
 type Mutation {
-  logIn(data: UserLogIn!): AuthenticatedUser
+  logIn(data: UserLogIn!): Token
+  sendMessage(data: MessageInput!): Message!
   signUp(data: UserSignUp!): User!
 }
 
@@ -26,12 +33,12 @@ type Query {
   findAllUsers(page: Float!): [User!]
   findUserById(id: String!): User
   getActiveTokens: [Token!]!
+  getAllMessagesSent(userId: String!): [Message!]!
 }
 
 type Token {
   id: ID!
   token: String!
-  user: String
   usersId: String!
 }
 
@@ -49,6 +56,6 @@ input UserLogIn {
 
 input UserSignUp {
   email: String!
-  name: String!
+  name: String
   password: String!
 }

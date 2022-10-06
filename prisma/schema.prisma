@@ -17,8 +17,8 @@ model Users {
   password  String
   createdAt DateTime   @default(now())
   tokens    Tokens[]
-  sentMessages     Message[] @relation("sentMessages")
-  receivedMessages Message[] @relation("receivedMessages")
+  sentMessages     Messages[] @relation("sentMessages")
+  receivedMessages Messages[] @relation("receivedMessages")
 }
 
 model Tokens {
@@ -28,8 +28,8 @@ model Tokens {
   usersId String
 }
 
-model Message {
-  id         Int    @id
+model Messages {
+  id         String  @id @default(cuid())
   text       String
   sender     Users   @relation(name: "sentMessages", fields: [senderId], references: [id])
   receiver   Users   @relation(name: "receivedMessages", fields: [receiverId], references: [id])
