@@ -36,6 +36,10 @@ type Query {
   getAllMessagesSent(userId: String!): [Message!]!
 }
 
+type Subscription {
+  messageNotification: Message!
+}
+
 type Token {
   id: ID!
   token: String!
