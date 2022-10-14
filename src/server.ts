@@ -15,10 +15,11 @@ import {
 } from "apollo-server-core";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
+import { PostResolver } from "./resolvers/Post/PostResolver";
 
 async function main() {
   const schema = await buildSchema({
-    resolvers: [UserResolver, TokenResolver, MessageResolver],
+    resolvers: [UserResolver, TokenResolver, MessageResolver, PostResolver],
     authChecker: AuthenticationAssurance,
     emitSchemaFile: path.resolve(__dirname, "schema.gql"),
   });

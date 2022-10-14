@@ -3,6 +3,14 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Comment {
+  Posts: Post
+  Users: User
+  comment: String!
+  createdAt: DateTime!
+  id: ID!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -23,9 +31,18 @@ input MessageInput {
 }
 
 type Mutation {
-  logIn(data: UserLogIn!): Token
+  createPost(author: String!, content: String!): Post!
+  logIn(email: String!, password: String!): Token
   sendMessage(data: MessageInput!): Message!
   signUp(data: UserSignUp!): User!
+}
+
+type Post {
+  author: User
+  comments: Comment
+  content: String!
+  createdAt: DateTime!
+  id: ID!
 }
 
 type Query {
@@ -34,6 +51,8 @@ type Query {
   findUserById(id: String!): User
   getActiveTokens: [Token!]!
   getAllMessagesSent(userId: String!): [Message!]!
+  getAllPosts(cursor: Float!): [Post!]!
+  getFirstPostsPage: [Post!]!
 }
 
 type Subscription {
@@ -43,6 +62,7 @@ type Subscription {
 type Token {
   id: ID!
   token: String!
+  user: User
   usersId: String!
 }
 
@@ -51,11 +71,6 @@ type User {
   email: String!
   id: ID!
   name: String
-}
-
-input UserLogIn {
-  email: String!
-  password: String!
 }
 
 input UserSignUp {
