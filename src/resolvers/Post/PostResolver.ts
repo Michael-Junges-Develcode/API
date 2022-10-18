@@ -1,3 +1,4 @@
+import { verify } from "jsonwebtoken";
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Context } from "../../context/context";
 import { Post } from "../../dtos/models/Post/Post";
@@ -44,7 +45,6 @@ export class PostResolver {
   async createPost(
     @Arg("content") content: string,
     @Arg("author") author: string,
-
     @Ctx() ctx: Context
   ) {
     const createdPost = await ctx.prisma.posts.create({
@@ -55,5 +55,26 @@ export class PostResolver {
       include: { author: true, comments: true },
     });
     return post;
+  }
+
+  @Mutation(() => String)
+  @Authorized()
+  async deleteOwnPost(@Arg("postId") postId: number, @Ctx() ctx: Context) {
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const token = ctx.token;
+    const user = verify(token, secret!).id;
+
+    const post = await ctx.prisma.posts.findUnique({
+      include: { author: true },
+      where: { id: postId },
+    });
+    if (!post) throw new Error("This post doesn't exist");
+    if (post?.authorId === user) {
+      await ctx.prisma.posts.delete({
+        where: { id: postId },
+      });
+      return `Successfully deleted post ${postId}`;
+    } else
+      return "Unauthorized delete attempt, informed user does not own this post";
   }
 }

@@ -32,6 +32,7 @@ input MessageInput {
 
 type Mutation {
   createPost(author: String!, content: String!): Post!
+  deleteOwnPost(postId: Float!): String!
   logIn(email: String!, password: String!): Token
   sendMessage(data: MessageInput!): Message!
   signUp(data: UserSignUp!): User!

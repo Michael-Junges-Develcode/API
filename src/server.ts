@@ -16,6 +16,7 @@ import {
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { PostResolver } from "./resolvers/Post/PostResolver";
+import { verify } from "jsonwebtoken";
 
 async function main() {
   const schema = await buildSchema({
@@ -38,7 +39,9 @@ async function main() {
     schema,
     context: ({ req }) => {
       const prisma = context.prisma;
-      const ctx = { req, token: req?.headers?.authorization, prisma };
+      const token = req?.headers?.authorization;
+      const splitToken = token?.split(" ")[1];
+      const ctx = { req, token: splitToken, prisma };
       return ctx;
     },
     plugins: [

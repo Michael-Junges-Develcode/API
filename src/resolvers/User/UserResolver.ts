@@ -69,7 +69,7 @@ export class UserResolver {
     });
     if (!user) return null;
 
-    return { id: user.id, email: user.email, createdAt: user.createdAt };
+    return { id: user.id, name: user.name ?? undefined, email: user.email, createdAt: user.createdAt };
   }
 
   @Query(() => [User], { nullable: true })
