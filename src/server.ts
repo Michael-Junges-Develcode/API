@@ -17,10 +17,11 @@ import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { PostResolver } from "./resolvers/Post/PostResolver";
 import { verify } from "jsonwebtoken";
+import { CommentResolver } from "./resolvers/Comment/CommentResolver";
 
 async function main() {
   const schema = await buildSchema({
-    resolvers: [UserResolver, TokenResolver, MessageResolver, PostResolver],
+    resolvers: [UserResolver, TokenResolver, MessageResolver, PostResolver, CommentResolver],
     authChecker: AuthenticationAssurance,
     emitSchemaFile: path.resolve(__dirname, "schema.gql"),
   });

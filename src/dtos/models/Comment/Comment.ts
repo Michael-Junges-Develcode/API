@@ -11,10 +11,10 @@ export class Comment {
   comment: string;
 
   @Field(() => User, { nullable: true })
-  Users?: User;
+  author?: User;
 
   @Field(() => Post, { nullable: true })
-  Posts?: Post;
+  post?: Post;
 
   @Field(() => Date)
   createdAt: Date;

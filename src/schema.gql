@@ -4,11 +4,11 @@
 # -----------------------------------------------
 
 type Comment {
-  Posts: Post
-  Users: User
+  author: User
   comment: String!
   createdAt: DateTime!
   id: ID!
+  post: Post
 }
 
 """
@@ -31,7 +31,9 @@ input MessageInput {
 }
 
 type Mutation {
+  createComment(authorId: String!, content: String!, postId: Float!): Comment!
   createPost(authorId: String!, content: String!): Post!
+  deleteComment(commentId: Float!): String!
   deleteOwnPost(postId: Float!): String!
   logIn(email: String!, password: String!): Token
   sendMessage(data: MessageInput!): Message!
@@ -40,7 +42,7 @@ type Mutation {
 
 type Post {
   author: User
-  comments: Comment
+  comments: [Comment!]
   content: String!
   createdAt: DateTime!
   id: ID!
@@ -53,6 +55,7 @@ type Query {
   getActiveTokens: [Token!]!
   getAllMessagesSent(userId: String!): [Message!]!
   getAllPosts(cursor: Float!): [Post!]!
+  getComments(postId: Float!): [Comment!]!
   getFirstPostsPage: [Post!]!
 }
 
@@ -68,10 +71,13 @@ type Token {
 }
 
 type User {
+  bannerUrl: String
+  bio: String
   createdAt: DateTime!
   email: String!
   id: ID!
   name: String
+  photoUrl: String
 }
 
 input UserSignUp {

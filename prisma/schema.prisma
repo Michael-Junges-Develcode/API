@@ -45,7 +45,7 @@ model Messages {
 }
 
 model Posts {
-  id        Int     @id @default(sequence())
+  id        Int        @id @default(sequence())
   content   String
   author    Users      @relation(fields: [authorId], references: [id])
   authorId  String
@@ -54,11 +54,11 @@ model Posts {
 }
 
 model Comments {
-  id        Int   @id @default(sequence())
+  id        Int      @id @default(sequence())
   comment   String
-  Users     Users?   @relation(fields: [usersId], references: [id])
-  usersId   String?
-  Posts     Posts?   @relation(fields: [postsId], references: [id])
-  postsId   Int?
+  author    Users   @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Posts   @relation(fields: [postsId], references: [id])
+  postsId   Int
   createdAt DateTime @default(now())
 }

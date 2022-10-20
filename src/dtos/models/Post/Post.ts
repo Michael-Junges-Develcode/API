@@ -13,8 +13,8 @@ export class Post {
   @Field(() => User, { nullable: true })
   author?: User;
 
-  @Field(() => Comment, { nullable: true })
-  comments?: Comment;
+  @Field((type) => [Comment], { nullable: true })
+  comments?: Comment[];
 
   @Field(() => Date)
   createdAt: Date;

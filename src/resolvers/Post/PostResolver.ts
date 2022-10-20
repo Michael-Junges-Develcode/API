@@ -18,7 +18,7 @@ export class PostResolver {
       },
       include: {
         author: true,
-        comments: true,
+        comments: { include: { author: true } },
       },
     });
     return posts;
@@ -34,7 +34,7 @@ export class PostResolver {
       },
       include: {
         author: true,
-        comments: true,
+        comments: { include: { author: true } },
       },
     });
     return posts;
