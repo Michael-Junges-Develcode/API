@@ -1,2 +1,2 @@
 # graphQL-basics
-API graphQL básica
+API NodeJS e graphql em contrução...
