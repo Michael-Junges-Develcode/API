@@ -11,29 +11,54 @@ datasource db {
 }
 
 model Users {
-  id        String     @id @default(cuid())
-  name      String?
-  email     String     @unique
-  password  String
-  createdAt DateTime   @default(now())
-  tokens    Tokens[]
+  id               String     @id @default(cuid())
+  name             String?
+  email            String     @unique
+  password         String
+  bio              String?
+  photoUrl         String?
+  bannerUrl        String?
+  createdAt        DateTime   @default(now())
+  tokens           Tokens[]
   sentMessages     Messages[] @relation("sentMessages")
   receivedMessages Messages[] @relation("receivedMessages")
+  posts            Posts[]
+  comments         Comments[]
 }
 
 model Tokens {
-  id      String @id @default(cuid())
-  token   String @unique
-  user    Users  @relation(fields: [usersId], references: [id])
-  usersId String
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      Users    @relation(fields: [usersId], references: [id])
+  usersId   String
+  createdAt DateTime @default(now())
 }
 
 model Messages {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   text       String
-  sender     Users   @relation(name: "sentMessages", fields: [senderId], references: [id])
-  receiver   Users   @relation(name: "receivedMessages", fields: [receiverId], references: [id])
+  sender     Users    @relation(name: "sentMessages", fields: [senderId], references: [id])
+  receiver   Users    @relation(name: "receivedMessages", fields: [receiverId], references: [id])
   senderId   String
   receiverId String
-  createdAt  DateTime   @default(now())
+  createdAt  DateTime @default(now())
+}
+
+model Posts {
+  id        Int        @id @default(sequence())
+  content   String
+  author    Users      @relation(fields: [authorId], references: [id])
+  authorId  String
+  comments  Comments[]
+  createdAt DateTime   @default(now())
+}
+
+model Comments {
+  id        Int      @id @default(sequence())
+  comment   String
+  author    Users   @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Posts   @relation(fields: [postsId], references: [id], onDelete: Cascade)
+  postsId   Int
+  createdAt DateTime @default(now())
 }

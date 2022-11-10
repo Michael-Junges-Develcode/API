@@ -69,7 +69,7 @@ export class UserResolver {
     });
     if (!user) return null;
 
-    return { id: user.id, email: user.email, createdAt: user.createdAt };
+    return { id: user.id, name: user.name ?? undefined, email: user.email, createdAt: user.createdAt };
   }
 
   @Query(() => [User], { nullable: true })
@@ -109,14 +109,18 @@ export class UserResolver {
   }
 
   @Mutation(() => Token, { nullable: true })
-  async logIn(@Arg("data") data: UserLogIn, @Ctx() ctx: Context) {
+  async logIn(
+    @Arg("email") email: string,
+    @Arg("password") password: string,
+    @Ctx() ctx: Context
+  ) {
     const user = await ctx.prisma.users.findUnique({
-      where: { email: data.email },
+      where: { email: email },
     });
 
     if (!user) throw new Error("Incorrect email/password combination");
 
-    const isValid = await bcrypt.compare(data.password, user.password);
+    const isValid = await bcrypt.compare(password, user.password);
     console.log(isValid);
 
     if (isValid === false)
@@ -135,6 +139,11 @@ export class UserResolver {
       data: { token: generatedToken, user: { connect: { id: user.id } } },
     });
 
-    return signedUser.token;
+    const dbToken = await ctx.prisma.tokens.findUnique({
+      where: { token: signedUser.token },
+      include: { user: true },
+    });
+
+    return dbToken;
   }
 }

@@ -14,11 +14,9 @@ const AuthenticationAssurance: AuthChecker<Context> = ({
 
   if (!authHeader) return false;
 
-  const [, token] = authHeader.split(" ");
-
   try {
     const secret = process.env.ACCESS_TOKEN_SECRET;
-    const decrypted = verify(token, secret!);
+    const decrypted = verify(authHeader, secret!);
     return !!decrypted;
   } catch {
     return false;

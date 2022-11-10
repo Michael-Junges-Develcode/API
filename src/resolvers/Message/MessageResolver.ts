@@ -1,12 +1,16 @@
 import {
   Arg,
+  Args,
   Authorized,
   Ctx,
   Field,
   InputType,
   Mutation,
+  PubSub,
+  PubSubEngine,
   Query,
   Resolver,
+  Root,
   Subscription,
 } from "type-graphql";
 import { Context } from "../../context/context";
@@ -42,7 +46,11 @@ export class MessageResolver {
 
   @Mutation(() => Message)
   @Authorized()
-  async sendMessage(@Arg("data") data: MessageInput, @Ctx() ctx: Context) {
+  async sendMessage(
+    @Arg("data") data: MessageInput,
+    @Ctx() ctx: Context,
+    @PubSub() pubSub: PubSubEngine
+  ) {
     const message = await ctx.prisma.messages.create({
       data: {
         text: data.text,
@@ -50,6 +58,17 @@ export class MessageResolver {
         receiver: { connect: { id: data.receiverId } },
       },
     });
+    await pubSub.publish("MESSAGES", message);
     return message;
+  }
+
+  @Subscription({
+    topics: "MESSAGES"
+  })
+  messageNotification(@Root() messagePayload: Message): Message {
+    console.log(messagePayload);
+    return {
+      ...messagePayload
+    };
   }
 }

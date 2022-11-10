@@ -9,6 +9,9 @@ export class Token {
   @Field()
   token: string;
 
+  @Field(() => User, {nullable: true})
+  user?: User;
+
   @Field()
   usersId: string;
 }

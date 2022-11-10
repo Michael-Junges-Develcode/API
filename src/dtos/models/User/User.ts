@@ -9,6 +9,15 @@ export class User {
   @Field({ nullable: true })
   name?: string;
 
+  @Field({ nullable: true })
+  bio?: string;
+
+  @Field({ nullable: true })
+  photoUrl?: string;
+
+  @Field({ nullable: true })
+  bannerUrl?: string;
+
   @Field()
   @IsEmail()
   email: string;

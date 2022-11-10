@@ -3,6 +3,14 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Comment {
+  author: User
+  comment: String!
+  createdAt: DateTime!
+  id: ID!
+  post: Post
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -23,9 +31,21 @@ input MessageInput {
 }
 
 type Mutation {
-  logIn(data: UserLogIn!): Token
+  createComment(authorId: String!, content: String!, postId: Float!): Comment!
+  createPost(authorId: String!, content: String!): Post!
+  deleteComment(commentId: Float!): String!
+  deleteOwnPost(postId: Float!): String!
+  logIn(email: String!, password: String!): Token
   sendMessage(data: MessageInput!): Message!
   signUp(data: UserSignUp!): User!
+}
+
+type Post {
+  author: User
+  comments: [Comment!]
+  content: String!
+  createdAt: DateTime!
+  id: ID!
 }
 
 type Query {
@@ -34,24 +54,30 @@ type Query {
   findUserById(id: String!): User
   getActiveTokens: [Token!]!
   getAllMessagesSent(userId: String!): [Message!]!
+  getAllPosts(cursor: Float!): [Post!]!
+  getComments(postId: Float!): [Comment!]!
+  getFirstPostsPage: [Post!]!
+}
+
+type Subscription {
+  messageNotification: Message!
 }
 
 type Token {
   id: ID!
   token: String!
+  user: User
   usersId: String!
 }
 
 type User {
+  bannerUrl: String
+  bio: String
   createdAt: DateTime!
   email: String!
   id: ID!
   name: String
-}
-
-input UserLogIn {
-  email: String!
-  password: String!
+  photoUrl: String
 }
 
 input UserSignUp {
