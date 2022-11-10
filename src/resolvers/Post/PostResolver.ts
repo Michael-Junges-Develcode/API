@@ -75,6 +75,6 @@ export class PostResolver {
       });
       return `Successfully deleted post ${postId}`;
     } else
-      return "Unauthorized delete attempt, informed user does not own this post";
+      return "Unauthorized";
   }
 }
