@@ -11,8 +11,9 @@ import {
 import { Context } from "../../context/context";
 import { User } from "../../dtos/models/User/User";
 import bcrypt from "bcrypt";
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import { Token } from "../../dtos/models/Token/Token";
+import { PrismaClientUnknownRequestError } from "@prisma/client/runtime";
 
 @InputType()
 class UserSignUp {
@@ -55,6 +56,7 @@ export class UserResolver {
       id: user.id,
       name: user.name ?? undefined,
       email: user.email,
+      photoUrl: user.photoUrl ?? undefined,
       createdAt: user.createdAt,
     };
   }
@@ -69,7 +71,12 @@ export class UserResolver {
     });
     if (!user) return null;
 
-    return { id: user.id, name: user.name ?? undefined, email: user.email, createdAt: user.createdAt };
+    return {
+      id: user.id,
+      name: user.name ?? undefined,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
   }
 
   @Query(() => [User], { nullable: true })
@@ -145,5 +152,33 @@ export class UserResolver {
     });
 
     return dbToken;
+  }
+
+  @Mutation(() => User)
+  async updateProfilePhoto(
+    @Arg("photoUrl") photoUrl: string,
+    @Ctx() ctx: Context
+  ): Promise<User | unknown> {
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const token = ctx.token;
+    const userId = verify(token, secret!).id;
+    try {
+      await ctx.prisma.users.update({
+        where: { id: userId },
+        data: { photoUrl: photoUrl },
+      });
+      const updatedUser = await ctx.prisma.users.findUnique({
+        where: { id: userId },
+      });
+      return {
+        id: updatedUser!.id,
+        name: updatedUser?.name ?? undefined,
+        email: updatedUser!.email,
+        createdAt: updatedUser!.createdAt,
+        photoUrl: updatedUser?.photoUrl ?? undefined,
+      };
+    } catch (err) {
+      return err
+    }
   }
 }

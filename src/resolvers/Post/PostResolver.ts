@@ -44,11 +44,13 @@ export class PostResolver {
   @Authorized()
   async createPost(
     @Arg("content") content: string,
-    @Arg("authorId") authorId: string,
     @Ctx() ctx: Context
   ) {
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const token = ctx.token;
+    const user = verify(token, secret!).id;
     const createdPost = await ctx.prisma.posts.create({
-      data: { content: content, author: { connect: { id: authorId } } },
+      data: { content: content, author: { connect: { id: user } } },
     });
     const post = await ctx.prisma.posts.findUnique({
       where: { id: createdPost.id },

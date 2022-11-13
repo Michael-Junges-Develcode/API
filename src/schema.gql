@@ -32,12 +32,13 @@ input MessageInput {
 
 type Mutation {
   createComment(authorId: String!, content: String!, postId: Float!): Comment!
-  createPost(authorId: String!, content: String!): Post!
+  createPost(content: String!): Post!
   deleteComment(commentId: Float!): String!
   deleteOwnPost(postId: Float!): String!
   logIn(email: String!, password: String!): Token
   sendMessage(data: MessageInput!): Message!
   signUp(data: UserSignUp!): User!
+  updateProfilePhoto(photoUrl: String!): User!
 }
 
 type Post {
